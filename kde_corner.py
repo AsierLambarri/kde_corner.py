@@ -53,7 +53,7 @@ def kde_corner(arviz_data,
                                                             }
                                         })
     
-    updated_kwargs['kde_kwargs'].update({'hexbin_kwargs': { 'cmap': colormap,  
+    updated_kwargs['hexbin_kwargs'].update({'hexbin_kwargs': { 'cmap': colormap,  
                                                             }
                                         })
     print(updated_kwargs)
@@ -72,8 +72,8 @@ def kde_corner(arviz_data,
     
     summary = arviz.summary(arfit)
     
-    xlabels = [axes[-1,j].get_xlabel() for j in range(4)]
-    ylabels = [axes[i, 0].get_ylabel() for i in range(4)]
+    xlabels = [axes[-1,j].get_xlabel() for j in range(len(var_names))]
+    ylabels = [axes[i, 0].get_ylabel() for i in range(len(var_names))]
     
     for j in range(len(axes)):
         pf = "+" + str(round(summary.loc[xlabels[j]]['hdi_97%'] - summary.loc[xlabels[j]][points_estimate],2))
