@@ -75,27 +75,46 @@ def kde_corner(arviz_data,
     xlabels = [axes[-1,j].get_xlabel() for j in range(len(var_names))]
     ylabels = [axes[i, 0].get_ylabel() for i in range(len(var_names))]
     
-    for j in range(len(axes)):
-        pf = "+" + str(round(summary.loc[xlabels[j]]['hdi_97%'] - summary.loc[xlabels[j]][points_estimate],2))
-        pn = str(round(summary.loc[xlabels[j]]['hdi_3%'] - summary.loc[xlabels[j]][points_estimate], 2))
+    if len(var_names) == 2:
+        axes[1, 0].scatter(
+                arfit.posterior[xlabels[0]].values.flatten(),  
+                arfit.posterior[ylabels[1]].values.flatten(),  
+                s=updated_kwargs['scatter_kwargs']['s'],  # Marker size
+                color=updated_kwargs['kde_kwargs']['contourf_kwargs']['cmap'](0),  
+                alpha=updated_kwargs['scatter_kwargs']['alpha'],
+                zorder=updated_kwargs['scatter_kwargs']['zorder']
+            )
+
+        pf = "+" + str(round(summary.loc[xlabels[0]]['hdi_97%'] - summary.loc[xlabels[0]][points_estimate],2))
+        pn = str(round(summary.loc[xlabels[0]]['hdi_3%'] - summary.loc[xlabels[0]][points_estimate], 2))
         
-        axes[j, j].set_title(f"{xlabels[j]}={summary.loc[xlabels[j]]['mean']:.2f}$_{{{pn}}}^{{{pf}}}$")
+        axes[0,0].set_title(f"{xlabels[0]}={summary.loc[xlabels[0]]['mean']:.2f}$_{{{pn}}}^{{{pf}}}$")
+
+
+        pf = "+" + str(round(summary.loc[ylabels[1]]['hdi_97%'] - summary.loc[ylabels[1]][points_estimate],2))
+        pn = str(round(summary.loc[ylabels[1]]['hdi_3%'] - summary.loc[ylabels[1]][points_estimate], 2))
         
-    
-    
-    for i in range(len(axes)):
+        axes[1,1].set_title(f"{ylabels[1]}={summary.loc[ylabels[1]]['mean']:.2f}$_{{{pn}}}^{{{pf}}}$")
+        
+    else:
+        for i in range(len(axes)):
+            for j in range(len(axes)):
+                if i != j:
+                    axes[i, j].scatter(
+                        arfit.posterior[xlabels[j]].values.flatten(),  
+                        arfit.posterior[ylabels[i]].values.flatten(),  
+                        s=updated_kwargs['scatter_kwargs']['s'], 
+                        color=updated_kwargs['kde_kwargs']['contourf_kwargs']['cmap'](0),  
+                        alpha=updated_kwargs['scatter_kwargs']['alpha'],
+                        zorder=updated_kwargs['scatter_kwargs']['zorder']
+                    )
+
         for j in range(len(axes)):
-            if i != j:
-                axes[i, j].scatter(
-                    arfit.posterior[xlabels[j]].values.flatten(),  
-                    arfit.posterior[ylabels[i]].values.flatten(),  
-                    s=updated_kwargs['scatter_kwargs']['s'],  # Marker size
-                    color=updated_kwargs['kde_kwargs']['contourf_kwargs']['cmap'](0),  
-                    alpha=updated_kwargs['scatter_kwargs']['alpha'],
-                    zorder=updated_kwargs['scatter_kwargs']['zorder']
-                )
-    
-    
+            pf = "+" + str(round(summary.loc[xlabels[j]]['hdi_97%'] - summary.loc[xlabels[j]][points_estimate],2))
+            pn = str(round(summary.loc[xlabels[j]]['hdi_3%'] - summary.loc[xlabels[j]][points_estimate], 2))
+            
+            axes[j, j].set_title(f"{xlabels[j]}={summary.loc[xlabels[j]]['mean']:.2f}$_{{{pn}}}^{{{pf}}}$")
+        
     plt.tight_layout()
     if save is not None:
         plt.savefig(save)
